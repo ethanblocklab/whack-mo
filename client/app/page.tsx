@@ -5,6 +5,7 @@ import './page.css'
 import { useAccount } from 'wagmi'
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
+import useWhackMoleContract from './hooks/useWhackMoleContract'
 
 export default function Main() {
   const { isConnected } = useAccount()
@@ -26,6 +27,8 @@ export default function Main() {
     y: 0,
   })
   const [gameShake, setGameShake] = useState(false)
+  const { whackMoleOnChain, isPending, isSuccess, isError, error } =
+    useWhackMoleContract()
 
   // Optional: Add audio references
   const [whackSound] = useState(() =>
@@ -43,6 +46,9 @@ export default function Main() {
 
   const whackMole = (index: number, e: React.MouseEvent) => {
     if (index === activeMole) {
+      // call contract
+      whackMoleOnChain()
+
       // Play sound effects if available
       if (whackSound) {
         whackSound.currentTime = 0
