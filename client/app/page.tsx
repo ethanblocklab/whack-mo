@@ -31,9 +31,10 @@ export default function Main() {
     let gameTimer: NodeJS.Timeout
 
     if (gameStarted && timeLeft > 0) {
-      // Move mole every 1000ms
+      // Move mole every 1000ms - Only runs on client side
       moleTimer = setInterval(() => {
-        setActiveMole(Math.floor(Math.random() * 9))
+        const newPosition = Math.floor(Math.random() * 9)
+        setActiveMole(newPosition)
       }, 1000)
 
       // Count down game timer
@@ -42,6 +43,7 @@ export default function Main() {
       }, 1000)
     } else if (timeLeft === 0) {
       setGameStarted(false)
+      setActiveMole(-1)
     }
 
     return () => {
@@ -61,14 +63,14 @@ export default function Main() {
       )}
       <div className={`container ${!isConnected ? 'not-connected' : ''}`}>
         <Image
-          src="/images/left-decoration.png"
+          src="/images/hammer.png"
           alt=""
           className="decoration decoration-left"
           width={200}
           height={200}
         />
         <Image
-          src="/images/right-decoration.png"
+          src="/images/mole.png"
           alt=""
           className="decoration decoration-right"
           width={200}
@@ -91,7 +93,7 @@ export default function Main() {
               <div className="timer">Time: {timeLeft}s</div>
             </div>
           </div>
-          <div className="mole-grid">
+          <div className={`mole-grid ${gameStarted ? 'game-started' : ''}`}>
             {Array(9)
               .fill(null)
               .map((_, index) => (
@@ -122,10 +124,10 @@ export default function Main() {
               </li>
               <li>
                 <a
-                  href="https://www.flaticon.com/free-icons/hammering"
-                  title="Hammering icons"
+                  href="https://www.flaticon.com/free-icons/legislation"
+                  title="legislation icons"
                 >
-                  Pixel Buddha Premium
+                  Legislation icons created by Freepik - Flaticon
                 </a>
               </li>
             </ul>

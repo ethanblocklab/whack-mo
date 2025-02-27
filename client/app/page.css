@@ -89,23 +89,30 @@
   aspect-ratio: 1;
   position: relative;
   cursor: pointer;
+  overflow: hidden;
+}
+
+.game-started .mole-hole {
+  cursor: url('/images/hammer_32*32.png') 16 16, pointer;
 }
 
 .mole {
   position: absolute;
-  bottom: 100%;
+  bottom: -100%;
   left: 50%;
   transform: translateX(-50%);
-  width: 80%;
-  height: 80%;
-  background: #8b4513;
-  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  background-image: url('/images/mole.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: bottom center;
   transition: bottom 0.1s ease-out;
   display: none;
 }
 
 .mole-active .mole {
-  bottom: 0;
+  bottom: -20%;
   display: block;
 }
 
@@ -190,4 +197,20 @@
 .attributions li:not(:last-child):after {
   content: ' • ';
   margin: 0 0.2rem;
+}
+
+@keyframes whack {
+  0% {
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) scale(0.8);
+  }
+  100% {
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+.mole-active .mole.whacked {
+  animation: whack 0.2s ease-out;
 }
