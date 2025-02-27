@@ -109,6 +109,27 @@ export default function Main() {
         </div>
         <div className="footer">
           <div className="footer-text">Break ❤️ Monad</div>
+          <div className="attributions">
+            Images by:
+            <ul>
+              <li>
+                <a
+                  href="https://www.flaticon.com/free-icons/mole"
+                  title="mole icons"
+                >
+                  Freepik
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://www.flaticon.com/free-icons/hammering"
+                  title="Hammering icons"
+                >
+                  Pixel Buddha Premium
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </>

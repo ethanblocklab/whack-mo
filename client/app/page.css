@@ -164,3 +164,30 @@
     font-size: 1rem;
   }
 }
+
+.footer-text {
+  font-size: 0.8rem;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.attributions {
+  font-size: 0.5rem;
+  text-align: center;
+  margin-top: 0.2rem;
+}
+
+.attributions ul {
+  list-style: none;
+  padding: 0;
+  margin: 0.2rem 0;
+}
+
+.attributions li {
+  display: inline;
+}
+
+.attributions li:not(:last-child):after {
+  content: ' • ';
+  margin: 0 0.2rem;
+}
