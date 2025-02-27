@@ -3,9 +3,18 @@
 import { DynamicWidget } from '@dynamic-labs/sdk-react-core'
 import './page.css'
 import { useAccount } from 'wagmi'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import useWhackMoleContract from './hooks/useWhackMoleContract'
+
+// Define a type for transaction logs
+type TransactionLog = {
+  id: string
+  type: 'pending' | 'success' | 'error'
+  message: string
+  hash?: string
+  timestamp: number
+}
 
 export default function Main() {
   const { isConnected } = useAccount()
@@ -27,8 +36,7 @@ export default function Main() {
     y: 0,
   })
   const [gameShake, setGameShake] = useState(false)
-  const { whackMoleOnChain, isPending, isSuccess, isError, error } =
-    useWhackMoleContract()
+  const { whackMoleOnChain, data } = useWhackMoleContract()
 
   // Optional: Add audio references
   const [whackSound] = useState(() =>
@@ -37,6 +45,35 @@ export default function Main() {
   const [pointSound] = useState(() =>
     typeof Audio !== 'undefined' ? new Audio('/sounds/point.wav') : null,
   )
+
+  // Add transaction logs state
+  const [txLogs, setTxLogs] = useState<TransactionLog[]>([])
+  const [showTxLog, setShowTxLog] = useState(false)
+
+  // Track previous states to detect changes
+  const prevDataRef = useRef<`0x${string}` | undefined>(undefined)
+
+  // Log transactions when status changes
+  useEffect(() => {
+    const now = Date.now()
+
+    // New pending transaction
+    if (data && data !== prevDataRef.current) {
+      setTxLogs((prev) => [
+        {
+          id: data,
+          type: 'pending',
+          message: 'new transaction',
+          hash: data,
+          timestamp: now,
+        },
+        ...prev,
+      ])
+    }
+
+    // Update previous state refs
+    prevDataRef.current = data
+  }, [data])
 
   const startGame = () => {
     setGameStarted(true)
@@ -134,6 +171,50 @@ export default function Main() {
         <DynamicWidget />
       )}
       <div className={`container ${!isConnected ? 'not-connected' : ''}`}>
+        {/* Transaction log toggle button */}
+        <button
+          className="tx-log-toggle"
+          onClick={() => setShowTxLog((prev) => !prev)}
+        >
+          {showTxLog ? 'Hide' : 'Show'} TX Log
+        </button>
+
+        {/* Transaction log panel */}
+        {showTxLog && (
+          <div className="tx-log-panel">
+            <h3>Transaction Log</h3>
+            {txLogs.length === 0 ? (
+              <p className="tx-log-empty">No transactions yet</p>
+            ) : (
+              <ul className="tx-log-list">
+                {txLogs.map((log) => (
+                  <li key={log.id} className={`tx-log-item tx-${log.type}`}>
+                    <div className="tx-log-time">
+                      {new Date(log.timestamp).toLocaleTimeString()}
+                    </div>
+                    <div className="tx-log-icon">
+                      {log.type === 'pending' && '⏳'}
+                      {log.type === 'success' && '✅'}
+                      {log.type === 'error' && '❌'}
+                    </div>
+                    <div className="tx-log-message">{log.message}</div>
+                    {log.hash && (
+                      <a
+                        href={`https://testnet.monadexplorer.com/tx/${log.hash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="tx-log-hash"
+                      >
+                        View
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+
         {/* Hammer effect element */}
         {showHammer && (
           <div

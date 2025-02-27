@@ -12,7 +12,7 @@ const ABI = [
 
 // Custom hook for contract interaction
 export default function useWhackMoleContract() {
-  const { writeContract, isPending, isSuccess, isError, error } =
+  const { writeContract, isPending, isSuccess, isError, error, data } =
     useWriteContract()
 
   const whackMoleOnChain = () => {
@@ -24,5 +24,5 @@ export default function useWhackMoleContract() {
     })
   }
 
-  return { whackMoleOnChain, isPending, isSuccess, isError, error }
+  return { whackMoleOnChain, isPending, isSuccess, isError, error, data }
 }
