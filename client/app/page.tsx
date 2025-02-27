@@ -12,6 +12,28 @@ export default function Main() {
   const [gameStarted, setGameStarted] = useState(false)
   const [activeMole, setActiveMole] = useState(-1)
   const [timeLeft, setTimeLeft] = useState(30)
+  const [whackedMole, setWhackedMole] = useState(-1)
+  const [hammerPosition, setHammerPosition] = useState({ x: 0, y: 0 })
+  const [showHammer, setShowHammer] = useState(false)
+  const [splatMole, setSplatMole] = useState(-1)
+  const [scorePopup, setScorePopup] = useState<{
+    show: boolean
+    x: number
+    y: number
+  }>({
+    show: false,
+    x: 0,
+    y: 0,
+  })
+  const [gameShake, setGameShake] = useState(false)
+
+  // Optional: Add audio references
+  const [whackSound] = useState(() =>
+    typeof Audio !== 'undefined' ? new Audio('/sounds/whack.wav') : null,
+  )
+  const [pointSound] = useState(() =>
+    typeof Audio !== 'undefined' ? new Audio('/sounds/point.wav') : null,
+  )
 
   const startGame = () => {
     setGameStarted(true)
@@ -19,8 +41,52 @@ export default function Main() {
     setTimeLeft(30)
   }
 
-  const whackMole = (index: number) => {
+  const whackMole = (index: number, e: React.MouseEvent) => {
     if (index === activeMole) {
+      // Play sound effects if available
+      if (whackSound) {
+        whackSound.currentTime = 0
+        whackSound.play().catch((e) => console.log('Audio play failed:', e))
+      }
+
+      if (pointSound) {
+        pointSound.currentTime = 0
+        pointSound.play().catch((e) => console.log('Audio play failed:', e))
+      }
+
+      // Set the whacked mole for animation
+      setWhackedMole(index)
+
+      // Show splat effect
+      setSplatMole(index)
+
+      // Show score popup at click position
+      setScorePopup({
+        show: true,
+        x: e.clientX,
+        y: e.clientY,
+      })
+
+      // Add shake effect to the game
+      setGameShake(true)
+
+      // Show hammer strike effect at click position
+      setHammerPosition({ x: e.clientX, y: e.clientY })
+      setShowHammer(true)
+
+      // Hide effects after animation completes
+      setTimeout(() => {
+        setShowHammer(false)
+        setScorePopup((prev) => ({ ...prev, show: false }))
+        setGameShake(false)
+      }, 300)
+
+      // Reset whacked and splat states after animation
+      setTimeout(() => {
+        setWhackedMole(-1)
+        setSplatMole(-1)
+      }, 300)
+
       setScore((prev) => prev + 1)
       setActiveMole(-1) // Force mole to hide immediately when whacked
     }
@@ -62,6 +128,32 @@ export default function Main() {
         <DynamicWidget />
       )}
       <div className={`container ${!isConnected ? 'not-connected' : ''}`}>
+        {/* Hammer effect element */}
+        {showHammer && (
+          <div
+            className="hammer striking"
+            style={{
+              position: 'fixed',
+              left: `${hammerPosition.x - 32}px`,
+              top: `${hammerPosition.y - 32}px`,
+            }}
+          />
+        )}
+
+        {/* Score popup */}
+        {scorePopup.show && (
+          <div
+            className="score-popup active"
+            style={{
+              position: 'fixed',
+              left: `${scorePopup.x - 20}px`,
+              top: `${scorePopup.y - 20}px`,
+            }}
+          >
+            +1
+          </div>
+        )}
+
         <Image
           src="/images/hammer.png"
           alt=""
@@ -77,7 +169,7 @@ export default function Main() {
           height={200}
         />
 
-        <div className="game-container">
+        <div className={`game-container ${gameShake ? 'game-shake' : ''}`}>
           <div className="game-info">
             {!gameStarted && (
               <button
@@ -102,9 +194,17 @@ export default function Main() {
                   className={`mole-hole ${
                     activeMole === index ? 'mole-active' : ''
                   }`}
-                  onClick={() => gameStarted && whackMole(index)}
+                  onClick={(e) => gameStarted && whackMole(index, e)}
                 >
-                  <div className="mole" />
+                  <div
+                    className={`mole ${whackedMole === index ? 'whacked' : ''}`}
+                  />
+                  {/* Add splat effect */}
+                  <div
+                    className={`mole-splat ${
+                      splatMole === index ? 'active' : ''
+                    }`}
+                  />
                 </div>
               ))}
           </div>
