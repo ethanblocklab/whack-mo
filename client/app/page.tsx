@@ -415,17 +415,25 @@ export default function Main() {
                 onClick={toggleLeaderboard}
                 title="Click to toggle leaderboard"
               />
+              <span className="leaderboard-label">Leaderboard</span>
             </div>
           </div>
         </div>
 
-        <div
-          className={`flex flex-col items-center justify-start mt-8 lg:mt-0 ${
-            showLeaderboard ? 'lg:flex' : 'lg:hidden'
-          }`}
-        >
-          <Leaderboard />
-        </div>
+        {/* Replace the inline leaderboard with a popup */}
+        {showLeaderboard && (
+          <div className="leaderboard-popup-overlay">
+            <div className="leaderboard-popup">
+              <button
+                className="leaderboard-close-btn"
+                onClick={toggleLeaderboard}
+              >
+                ×
+              </button>
+              <Leaderboard />
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="footer">
