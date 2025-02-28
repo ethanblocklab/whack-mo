@@ -10,6 +10,7 @@ import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import useWhackMoleContract from './hooks/useWhackMoleContract'
 import toast, { Toaster } from 'react-hot-toast'
+import Leaderboard from './components/Leaderboard'
 
 // Define a type for transaction logs
 type TransactionLog = {
@@ -87,6 +88,9 @@ export default function Main() {
 
   // Add state for confirmation modal
   const [showFundingConfirmation, setShowFundingConfirmation] = useState(false)
+
+  // Add state for leaderboard visibility
+  const [showLeaderboard, setShowLeaderboard] = useState(false)
 
   const startGame = async () => {
     try {
@@ -204,218 +208,250 @@ export default function Main() {
     }
   }, [gameStarted, timeLeft])
 
+  // Function to toggle leaderboard visibility
+  const toggleLeaderboard = () => {
+    console.log('toggleLeaderboard')
+    setShowLeaderboard((prev) => !prev)
+  }
+
   return (
-    <>
-      {/* Add Toaster component */}
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 5000,
-          style: {
-            background: '#fff',
-            color: '#333',
-            padding: '16px',
-            borderRadius: '8px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-          },
-          success: {
+    <main className="flex min-h-screen flex-col items-center justify-between p-4 overflow-y-auto">
+      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
+        {/* Add Toaster component */}
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 5000,
             style: {
-              background: '#e8f5e9',
-              borderLeft: '4px solid #4caf50',
+              background: '#fff',
+              color: '#333',
+              padding: '16px',
+              borderRadius: '8px',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
             },
-          },
-          error: {
-            style: {
-              background: '#ffebee',
-              borderLeft: '4px solid #f44336',
+            success: {
+              style: {
+                background: '#e8f5e9',
+                borderLeft: '4px solid #4caf50',
+              },
             },
-          },
-        }}
-      />
+            error: {
+              style: {
+                background: '#ffebee',
+                borderLeft: '4px solid #f44336',
+              },
+            },
+          }}
+        />
 
-      {/* Custom Funding Confirmation Modal */}
-      {showFundingConfirmation && (
-        <div className="funding-confirmation-overlay">
-          <div className="funding-confirmation-modal">
-            <h3>Insufficient Funds</h3>
-            <p>You need at least 0.05 ETH to play this game.</p>
-            <p>Would you like to add funds to your wallet now?</p>
-            <div className="funding-confirmation-buttons">
-              <button
-                className="funding-confirmation-button funding-confirmation-cancel"
-                onClick={() => handleFundingConfirmation(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="funding-confirmation-button funding-confirmation-confirm"
-                onClick={() => handleFundingConfirmation(true)}
-              >
-                Add Funds
-              </button>
+        {/* Custom Funding Confirmation Modal */}
+        {showFundingConfirmation && (
+          <div className="funding-confirmation-overlay">
+            <div className="funding-confirmation-modal">
+              <h3>Insufficient Funds</h3>
+              <p>You need at least 0.05 MON to play this game.</p>
+              <p>Would you like to add funds to your wallet now?</p>
+              <div className="funding-confirmation-buttons">
+                <button
+                  className="funding-confirmation-button funding-confirmation-cancel"
+                  onClick={() => handleFundingConfirmation(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="funding-confirmation-button funding-confirmation-confirm"
+                  onClick={() => handleFundingConfirmation(true)}
+                >
+                  Add Funds
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {!isConnected ? (
-        <div className="wallet-connect-overlay">
+        {!isConnected ? (
+          <div className="wallet-connect-overlay">
+            <DynamicWidget />
+          </div>
+        ) : (
           <DynamicWidget />
-        </div>
-      ) : (
-        <DynamicWidget />
-      )}
-      <div className={`container ${!isConnected ? 'not-connected' : ''}`}>
-        {/* Transaction log toggle button */}
-        <button
-          className="tx-log-toggle"
-          onClick={() => setShowTxLog((prev) => !prev)}
-        >
-          {showTxLog ? 'Hide' : 'Show'} TX Log
-        </button>
-
-        {/* Transaction log panel */}
-        {showTxLog && (
-          <div className="tx-log-panel">
-            <h3>Transaction Log</h3>
-            {txLogs.length === 0 ? (
-              <p className="tx-log-empty">No transactions yet</p>
-            ) : (
-              <ul className="tx-log-list">
-                {txLogs.map((log) => (
-                  <li key={log.id} className={`tx-log-item tx-${log.type}`}>
-                    <div className="tx-log-time">
-                      {new Date(log.timestamp).toLocaleTimeString()}
-                    </div>
-                    <div className="tx-log-icon">
-                      {log.type === 'pending' && '⏳'}
-                      {log.type === 'success' && '✅'}
-                      {log.type === 'error' && '❌'}
-                    </div>
-                    <div className="tx-log-message">{log.message}</div>
-                    {log.hash && (
-                      <a
-                        href={`https://testnet.monadexplorer.com/tx/${log.hash}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="tx-log-hash"
-                      >
-                        View
-                      </a>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
         )}
+      </div>
 
-        {/* Hammer effect element */}
-        {showHammer && (
-          <div
-            className="hammer striking"
-            style={{
-              position: 'fixed',
-              left: `${hammerPosition.x - 32}px`,
-              top: `${hammerPosition.y - 32}px`,
-            }}
-          />
-        )}
-
-        {/* Score popup */}
-        {scorePopup.show && (
-          <div
-            className="score-popup active"
-            style={{
-              position: 'fixed',
-              left: `${scorePopup.x - 20}px`,
-              top: `${scorePopup.y - 20}px`,
-            }}
+      <div className="grid grid-cols-1 gap-8 w-full max-w-5xl">
+        <div className="flex flex-col items-center justify-center">
+          {/* Transaction log toggle button */}
+          <button
+            className="tx-log-toggle"
+            onClick={() => setShowTxLog((prev) => !prev)}
           >
-            +1
-          </div>
-        )}
+            {showTxLog ? 'Hide' : 'Show'} TX Log
+          </button>
 
-        <Image
-          src="/images/hammer.png"
-          alt=""
-          className="decoration decoration-left"
-          width={200}
-          height={200}
-        />
-        <Image
-          src="/images/mole.png"
-          alt=""
-          className="decoration decoration-right"
-          width={200}
-          height={200}
-        />
+          {/* Transaction log panel */}
+          {showTxLog && (
+            <div className="tx-log-panel">
+              <h3>Transaction Log</h3>
+              {txLogs.length === 0 ? (
+                <p className="tx-log-empty">No transactions yet</p>
+              ) : (
+                <ul className="tx-log-list">
+                  {txLogs.map((log) => (
+                    <li key={log.id} className={`tx-log-item tx-${log.type}`}>
+                      <div className="tx-log-time">
+                        {new Date(log.timestamp).toLocaleTimeString()}
+                      </div>
+                      <div className="tx-log-icon">
+                        {log.type === 'pending' && '⏳'}
+                        {log.type === 'success' && '✅'}
+                        {log.type === 'error' && '❌'}
+                      </div>
+                      <div className="tx-log-message">{log.message}</div>
+                      {log.hash && (
+                        <a
+                          href={`https://testnet.monadexplorer.com/tx/${log.hash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="tx-log-hash"
+                        >
+                          View
+                        </a>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
 
-        <div className={`game-container ${gameShake ? 'game-shake' : ''}`}>
-          <div className="game-info">
-            {!gameStarted && (
-              <button
-                disabled={!isConnected}
-                className="start-button"
-                onClick={startGame}
-              >
-                START GAME
-              </button>
-            )}
-            <div className="stats">
-              <div className="score">Score: {score}</div>
-              <div className="timer">Time: {timeLeft}s</div>
+          {/* Hammer effect element */}
+          {showHammer && (
+            <div
+              className="hammer striking"
+              style={{
+                position: 'fixed',
+                left: `${hammerPosition.x - 32}px`,
+                top: `${hammerPosition.y - 32}px`,
+              }}
+            />
+          )}
+
+          {/* Score popup */}
+          {scorePopup.show && (
+            <div
+              className="score-popup active"
+              style={{
+                position: 'fixed',
+                left: `${scorePopup.x - 20}px`,
+                top: `${scorePopup.y - 20}px`,
+              }}
+            >
+              +1
+            </div>
+          )}
+
+          {/* Replace the flex-row div with the game-row class */}
+          <div className="game-row">
+            <div className="decoration-container">
+              <Image
+                src="/images/hammer.png"
+                alt=""
+                className="decoration decoration-left"
+                width={200}
+                height={200}
+              />
+            </div>
+
+            <div className={`game-container ${gameShake ? 'game-shake' : ''}`}>
+              <div className="game-info">
+                {!gameStarted && (
+                  <button
+                    disabled={!isConnected}
+                    className="start-button"
+                    onClick={startGame}
+                  >
+                    START GAME
+                  </button>
+                )}
+                <div className="stats">
+                  <div className="score">Score: {score}</div>
+                  <div className="timer">Time: {timeLeft}s</div>
+                </div>
+              </div>
+              <div className={`mole-grid ${gameStarted ? 'game-started' : ''}`}>
+                {Array(9)
+                  .fill(null)
+                  .map((_, index) => (
+                    <div
+                      key={index}
+                      className={`mole-hole ${
+                        activeMole === index ? 'mole-active' : ''
+                      }`}
+                      onClick={(e) => gameStarted && whackMole(index, e)}
+                    >
+                      <div
+                        className={`mole ${
+                          whackedMole === index ? 'whacked' : ''
+                        }`}
+                      />
+                      {/* Add splat effect */}
+                      <div
+                        className={`mole-splat ${
+                          splatMole === index ? 'active' : ''
+                        }`}
+                      />
+                    </div>
+                  ))}
+              </div>
+            </div>
+
+            <div className="decoration-container">
+              <Image
+                src="/images/mole.png"
+                alt=""
+                className="decoration decoration-right cursor-pointer"
+                width={200}
+                height={200}
+                onClick={toggleLeaderboard}
+                title="Click to toggle leaderboard"
+              />
             </div>
           </div>
-          <div className={`mole-grid ${gameStarted ? 'game-started' : ''}`}>
-            {Array(9)
-              .fill(null)
-              .map((_, index) => (
-                <div
-                  key={index}
-                  className={`mole-hole ${
-                    activeMole === index ? 'mole-active' : ''
-                  }`}
-                  onClick={(e) => gameStarted && whackMole(index, e)}
-                >
-                  <div
-                    className={`mole ${whackedMole === index ? 'whacked' : ''}`}
-                  />
-                  {/* Add splat effect */}
-                  <div
-                    className={`mole-splat ${
-                      splatMole === index ? 'active' : ''
-                    }`}
-                  />
-                </div>
-              ))}
-          </div>
         </div>
-        <div className="footer">
-          <div className="footer-text">Break ❤️ Monad</div>
-          <div className="attributions">
-            Images by:
-            <ul>
-              <li>
-                <a
-                  href="https://www.flaticon.com/free-icons/mole"
-                  title="mole icons"
-                >
-                  Freepik
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://www.flaticon.com/free-icons/legislation"
-                  title="legislation icons"
-                >
-                  Legislation icons created by Freepik - Flaticon
-                </a>
-              </li>
-            </ul>
-          </div>
+
+        <div
+          className={`flex flex-col items-center justify-start mt-8 lg:mt-0 ${
+            showLeaderboard ? 'lg:flex' : 'lg:hidden'
+          }`}
+        >
+          <Leaderboard />
         </div>
       </div>
-    </>
+
+      <div className="footer">
+        <div className="footer-text">Break ❤️ Monad</div>
+        <div className="attributions">
+          Images by:
+          <ul>
+            <li>
+              <a
+                href="https://www.flaticon.com/free-icons/mole"
+                title="mole icons"
+              >
+                Freepik
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://www.flaticon.com/free-icons/legislation"
+                title="legislation icons"
+              >
+                Legislation icons created by Freepik - Flaticon
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </main>
   )
 }

@@ -1,57 +1,64 @@
-:root {
-  --background-start: rgb(33, 26, 61);
-  --background-end: rgb(0, 0, 0);
-  --button-primary: #6e54ff;
-  --button-hover: #836ef9;
-  --card-background: #38008f/[0.18];
-  --text-primary: #ffffff;
-  --text-secondary: #a0aec0;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #1a1f2c;
-    --foreground: #ffffff;
-    --text-primary: #ecf0f1;
-    --text-secondary: #bdc3c7;
+    --background-start: rgb(33, 26, 61);
+    --background-end: rgb(0, 0, 0);
+    --button-primary: #6e54ff;
+    --button-hover: #836ef9;
+    --card-background: #38008f/[0.18];
+    --text-primary: #ffffff;
+    --text-secondary: #a0aec0;
   }
-}
 
-html,
-body {
-  max-width: 100vw;
-  min-height: 100vh;
-  overflow: hidden;
-}
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background: #1a1f2c;
+      --foreground: #ffffff;
+      --text-primary: #ecf0f1;
+      --text-secondary: #bdc3c7;
+    }
+  }
 
-body {
-  color: var(--text-primary);
-  background: linear-gradient(
-    to bottom,
-    var(--background-start) 20%,
-    var(--background-end) 100%
-  );
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  line-height: 1.6;
-}
+  html,
+  body {
+    max-width: 100vw;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
+  body {
+    color: var(--text-primary);
+    background: linear-gradient(
+      to bottom,
+      var(--background-start) 20%,
+      var(--background-end) 100%
+    );
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.6;
+  }
 
-a {
-  color: inherit;
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
+  * {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+  }
 
-button {
-  font-family: inherit;
+  a {
+    color: inherit;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  button {
+    font-family: inherit;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
