@@ -434,7 +434,7 @@ export default function Main() {
               >
                 ×
               </button>
-              <Leaderboard />
+              <Leaderboard isVisible={showLeaderboard} />
             </div>
           </div>
         )}

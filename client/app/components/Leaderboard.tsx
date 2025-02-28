@@ -15,14 +15,20 @@ type Player = {
   points: number
 }
 
-export default function Leaderboard() {
+export default function Leaderboard({ isVisible }: { isVisible?: boolean }) {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
 
   // Use Apollo useQuery hook to fetch data
   const { loading, error, data, refetch } = useQuery(GET_LEADERBOARD)
 
+  // Refetch when the component becomes visible
   useEffect(() => {
-    console.log(data)
+    if (isVisible) {
+      refetch()
+    }
+  }, [isVisible, refetch])
+
+  useEffect(() => {
     if (data && data.players && data.players.items) {
       try {
         const formattedLeaderboard = data.players.items.map(
