@@ -8,7 +8,7 @@ import './page.css'
 import { useAccount, useBalance } from 'wagmi'
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
-import useWhackMoleContract from './hooks/useWhackMoleContract'
+import useWhackMoleContract from './hooks/useWhackMoContract'
 import toast, { Toaster } from 'react-hot-toast'
 import Leaderboard from './components/Leaderboard'
 
@@ -41,7 +41,7 @@ export default function Main() {
     y: 0,
   })
   const [gameShake, setGameShake] = useState(false)
-  const { whackMoleOnChain, data } = useWhackMoleContract()
+  const { whackMoleOnChain, data, isError, error } = useWhackMoleContract()
 
   const { refetch } = useBalance({
     address: address,
@@ -82,9 +82,13 @@ export default function Main() {
       ])
     }
 
+    if (isError && error) {
+      toast.error(error.message)
+    }
+
     // Update previous state refs
     prevDataRef.current = data
-  }, [data])
+  }, [data, isError, error])
 
   // Add state for confirmation modal
   const [showFundingConfirmation, setShowFundingConfirmation] = useState(false)

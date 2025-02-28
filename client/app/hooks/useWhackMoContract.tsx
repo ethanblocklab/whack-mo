@@ -2,11 +2,11 @@ import { useWriteContract } from 'wagmi'
 
 const ABI = [
   {
+    type: 'function',
+    name: 'whackMo',
     inputs: [],
-    name: 'increment',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
   },
 ]
 
@@ -16,10 +16,11 @@ export default function useWhackMoleContract() {
     useWriteContract()
 
   const whackMoleOnChain = () => {
+    console.log('whackMoleOnChain')
     writeContract({
-      address: '0x07A262a2181E12a7CB781f900dD4645174eb792B', // Same contract address
+      address: '0x6f147867b9c56CbE5E95ccCA966493319b6c21e3',
       abi: ABI,
-      functionName: 'increment',
+      functionName: 'whackMo',
       args: [],
     })
   }
