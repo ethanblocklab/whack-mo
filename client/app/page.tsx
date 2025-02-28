@@ -1,11 +1,15 @@
 'use client'
 
-import { DynamicWidget } from '@dynamic-labs/sdk-react-core'
+import {
+  DynamicWidget,
+  useOpenFundingOptions,
+} from '@dynamic-labs/sdk-react-core'
 import './page.css'
-import { useAccount } from 'wagmi'
+import { useAccount, useBalance } from 'wagmi'
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import useWhackMoleContract from './hooks/useWhackMoleContract'
+import toast, { Toaster } from 'react-hot-toast'
 
 // Define a type for transaction logs
 type TransactionLog = {
@@ -17,7 +21,7 @@ type TransactionLog = {
 }
 
 export default function Main() {
-  const { isConnected } = useAccount()
+  const { isConnected, address } = useAccount()
   const [score, setScore] = useState(0)
   const [gameStarted, setGameStarted] = useState(false)
   const [activeMole, setActiveMole] = useState(-1)
@@ -37,6 +41,12 @@ export default function Main() {
   })
   const [gameShake, setGameShake] = useState(false)
   const { whackMoleOnChain, data } = useWhackMoleContract()
+
+  const { refetch } = useBalance({
+    address: address,
+  })
+
+  const { openFundingOptions } = useOpenFundingOptions()
 
   // Optional: Add audio references
   const [whackSound] = useState(() =>
@@ -75,10 +85,43 @@ export default function Main() {
     prevDataRef.current = data
   }, [data])
 
-  const startGame = () => {
-    setGameStarted(true)
-    setScore(0)
-    setTimeLeft(30)
+  // Add state for confirmation modal
+  const [showFundingConfirmation, setShowFundingConfirmation] = useState(false)
+
+  const startGame = async () => {
+    try {
+      const { data: currentBalance } = await refetch()
+
+      if (!currentBalance) {
+        toast.error('Failed to fetch wallet balance')
+        return
+      }
+
+      if (currentBalance.value < BigInt('50000000000000000')) {
+        // Show confirmation modal instead of directly opening funding options
+        setShowFundingConfirmation(true)
+        return
+      }
+
+      setGameStarted(true)
+      setScore(0)
+      setTimeLeft(30)
+    } catch (error) {
+      toast.error(
+        'Error starting game: ' +
+          (error instanceof Error ? error.message : String(error)),
+      )
+    }
+  }
+
+  // Function to handle funding confirmation
+  const handleFundingConfirmation = (confirmed: boolean) => {
+    setShowFundingConfirmation(false)
+
+    if (confirmed) {
+      // User confirmed, open funding options
+      openFundingOptions()
+    }
   }
 
   const whackMole = (index: number, e: React.MouseEvent) => {
@@ -163,6 +206,58 @@ export default function Main() {
 
   return (
     <>
+      {/* Add Toaster component */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 5000,
+          style: {
+            background: '#fff',
+            color: '#333',
+            padding: '16px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+          },
+          success: {
+            style: {
+              background: '#e8f5e9',
+              borderLeft: '4px solid #4caf50',
+            },
+          },
+          error: {
+            style: {
+              background: '#ffebee',
+              borderLeft: '4px solid #f44336',
+            },
+          },
+        }}
+      />
+
+      {/* Custom Funding Confirmation Modal */}
+      {showFundingConfirmation && (
+        <div className="funding-confirmation-overlay">
+          <div className="funding-confirmation-modal">
+            <h3>Insufficient Funds</h3>
+            <p>You need at least 0.05 ETH to play this game.</p>
+            <p>Would you like to add funds to your wallet now?</p>
+            <div className="funding-confirmation-buttons">
+              <button
+                className="funding-confirmation-button funding-confirmation-cancel"
+                onClick={() => handleFundingConfirmation(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="funding-confirmation-button funding-confirmation-confirm"
+                onClick={() => handleFundingConfirmation(true)}
+              >
+                Add Funds
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {!isConnected ? (
         <div className="wallet-connect-overlay">
           <DynamicWidget />
