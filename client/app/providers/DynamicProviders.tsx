@@ -36,7 +36,11 @@ const rpcUrlOverrides = {
   '10143': [process.env.NEXT_PUBLIC_RPC_URL],
 }
 
-export default function Providers({ children }: { children: React.ReactNode }) {
+export default function DynamicProvider({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
     <DynamicContextProvider
       theme="auto"

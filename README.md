@@ -13,3 +13,4 @@ This project utilizes the following third-party services:
 1. **Alchemy RPC** - For blockchain node infrastructure and API access
 2. **Dynamic Embedded Wallet Service** - For wallet management and authentication
 3. **Vercel** - For application deployment and hosting
+4. **GhostGraph** - For index events
