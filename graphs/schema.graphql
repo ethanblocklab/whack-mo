@@ -7,3 +7,8 @@ type MoWhacked @entity(immutable: true) {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
+
+type Leaderboard @entity {
+  id: Bytes!
+  points: BigInt! # uint256
+}
