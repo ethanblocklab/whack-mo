@@ -8,9 +8,9 @@ import {
 } from "matchstick-as/assembly/index"
 import { Address, BigInt } from "@graphprotocol/graph-ts"
 import { MoWhacked } from "../generated/schema"
-import { MoWhacked as MoWhackedEvent } from "../generated/WhackAMo/WhackAMo"
-import { handleMoWhacked } from "../src/whack-a-mo"
-import { createMoWhackedEvent } from "./whack-a-mo-utils"
+import { MoWhacked as MoWhackedEvent } from "../generated/Contract/Contract"
+import { handleMoWhacked } from "../src/contract"
+import { createMoWhackedEvent } from "./contract-utils"
 
 // Tests structure (matchstick-as >=0.5.0)
 // https://thegraph.com/docs/en/developer/matchstick/#tests-structure-0-5-0

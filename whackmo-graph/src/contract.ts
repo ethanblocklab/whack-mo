@@ -1,4 +1,4 @@
-import { MoWhacked as MoWhackedEvent } from "../generated/WhackAMo/WhackAMo"
+import { MoWhacked as MoWhackedEvent } from "../generated/Contract/Contract"
 import { MoWhacked } from "../generated/schema"
 
 export function handleMoWhacked(event: MoWhackedEvent): void {

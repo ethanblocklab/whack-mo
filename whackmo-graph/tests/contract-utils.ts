@@ -1,6 +1,6 @@
 import { newMockEvent } from "matchstick-as"
 import { ethereum, Address, BigInt } from "@graphprotocol/graph-ts"
-import { MoWhacked } from "../generated/WhackAMo/WhackAMo"
+import { MoWhacked } from "../generated/Contract/Contract"
 
 export function createMoWhackedEvent(
   player: Address,

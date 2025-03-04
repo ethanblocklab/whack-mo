@@ -5,11 +5,11 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: WhackAMo
+    name: Contract
     network: monad-testnet
     source:
       address: "0x6f147867b9c56CbE5E95ccCA966493319b6c21e3"
-      abi: WhackAMo
+      abi: Contract
       startBlock: 5462723
     mapping:
       kind: ethereum/events
@@ -18,9 +18,9 @@ dataSources:
       entities:
         - MoWhacked
       abis:
-        - name: WhackAMo
-          file: ./abis/WhackAMo.json
+        - name: Contract
+          file: ./abis/Contract.json
       eventHandlers:
         - event: MoWhacked(indexed address,uint256,uint256)
           handler: handleMoWhacked
-      file: ./src/whack-a-mo.ts
+      file: ./src/contract.ts

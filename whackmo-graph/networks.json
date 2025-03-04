@@ -1,6 +1,6 @@
 {
   "monad-testnet": {
-    "WhackAMo": {
+    "Contract": {
       "address": "0x6f147867b9c56CbE5E95ccCA966493319b6c21e3",
       "startBlock": 5462723
     }
